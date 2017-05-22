@@ -1,0 +1,3 @@
+START DCA.exe
+START DCASlave.exe
+START DCAGUI.exe
