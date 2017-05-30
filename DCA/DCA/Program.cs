@@ -13,7 +13,8 @@ namespace DCA
     {
         static void Main(string[] args)
         {
-            ServiceHost host = CreateHost();
+            MasterControllerImpl masterController = new MasterControllerImpl();
+            ServiceHost host = CreateHost(masterController);
 
             host.Open();
             Console.WriteLine("Press Enter to Exit");
@@ -22,7 +23,7 @@ namespace DCA
         }
 
         //Creates the server host
-        private static ServiceHost CreateHost()
+        private static ServiceHost CreateHost(MasterControllerImpl masterController)
         {
             ServiceHost host;
             NetTcpBinding tcpBinding = new NetTcpBinding();
@@ -30,8 +31,8 @@ namespace DCA
             tcpBinding.MaxReceivedMessageSize = System.Int32.MaxValue;
             tcpBinding.ReaderQuotas.MaxArrayLength = System.Int32.MaxValue;
 
-            host = new ServiceHost(typeof(MasterControllerImpl));
-            host.AddServiceEndpoint(typeof(IMasterController), tcpBinding, Constants._SURL);
+            host = new ServiceHost(masterController);
+            host.AddServiceEndpoint(typeof(IMasterController), tcpBinding, "net.tcp://localhost:50002/DCAMaster");
             return host;
         }
     }

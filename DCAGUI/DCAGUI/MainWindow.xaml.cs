@@ -25,7 +25,11 @@ namespace DCAGUI
         IMasterController channel;
         List<Airport> airports;
 
-        public List<Airport> Airports { get => airports; set => airports = value; }
+        public List<Airport> Airports
+        {
+            get { return airports; }
+            set { airports = value; }
+        }
 
         public MainWindow()
         {
@@ -35,40 +39,40 @@ namespace DCAGUI
             LoadAirports();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void btnStep_Click(object sender, RoutedEventArgs e)
         {
             if (channel != null)
             {
-                channel.init();
+                channel.StepAsync();
                 LoadAirports();
             }
         }
-
+        //Creates a channel to the Master server
         public IMasterController CreateChannel()
         {
             NetTcpBinding tcpBinding = new NetTcpBinding();
             tcpBinding.MaxReceivedMessageSize = System.Int32.MaxValue;
             tcpBinding.ReaderQuotas.MaxArrayLength = System.Int32.MaxValue;
             CallBackObject callbackObj = new CallBackObject();
-            DuplexChannelFactory<IMasterController> channelFactory = new DuplexChannelFactory<IMasterController>(callbackObj, tcpBinding, Constants._SURL);
+            DuplexChannelFactory<IMasterController> channelFactory = new DuplexChannelFactory<IMasterController>(callbackObj, tcpBinding, "net.tcp://localhost:50002/DCAMaster");
             return channelFactory.CreateChannel();
         }
-
+        //Load all airports from Master server
         public void LoadAirports()
         {
             if (channel != null)
             {
                 Airports = channel.GetAirports();
                 airportListView.ItemsSource = Airports;
-                
+                //RefreshPlaneList();
             }
         }
-
+        
         private void airportListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             RefreshPlaneList();
         }
-
+        //Refresh the list of planes according to the airport selected
         private void RefreshPlaneList()
         {
             if (airportListView.SelectedItem != null)
@@ -76,26 +80,40 @@ namespace DCAGUI
                 Airport airport = (Airport)airportListView.SelectedItem;
                 if (airport != null)
                 {
-                    List<AirPlane> planes = airport.LandedPlanes.ToList();
-                    planesListView.ItemsSource = planes;
-                    planesListView.Items.Refresh();
+                    List<AirPlane> circlingPlanes = airport.CirclingPlanes.ToList();
+                    List<AirPlane> enteringCirclingPlanes = airport.EnteringCirclingPlanes.ToList();
+                    List<AirPlane> crashedPlanes = airport.CrashedPlanes.ToList();
 
-                    outBoundPlanesListView.ItemsSource = airport.InTransit;
+                    inBoundPlanesListView.ItemsSource = circlingPlanes.Concat(enteringCirclingPlanes).Concat(crashedPlanes);
+                    inBoundPlanesListView.Items.Refresh();
+
+                    List<AirPlane> landedPlanes = airport.LandedPlanes.ToList();
+                    List<AirPlane> inTransitPlanes = airport.InTransit.ToList();
+
+                    outBoundPlanesListView.ItemsSource = landedPlanes.Concat(inTransitPlanes);
                     outBoundPlanesListView.Items.Refresh();
                 }
             }
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        
+
+        private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
             LoadAirports();
             RefreshPlaneList();
         }
+
     }
 
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     public class CallBackObject : IMasterControllerCallback
     {
+        public void HandoverPlane(AirPlane plane)
+        {
+            throw new NotImplementedException();
+        }
+
         [OperationBehavior]
         public void Simulate()
         {

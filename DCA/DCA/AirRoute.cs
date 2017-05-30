@@ -29,23 +29,36 @@ namespace DCA
 
         public int ToAirportID
         {
-            get => toAirportID;
-            set => toAirportID = value;
+            get { return toAirportID; }
+            set
+            {
+                toAirportID = value;
+            }
         }
         public int RouteId
         {
-            get => routeId;
-            set => routeId = value;
+            get
+            { return routeId; }
+            set
+            {
+                routeId = value;
+            }
         }
         public double DistanceKm
         {
-            get => distanceKm;
-            set => distanceKm = value;
+            get
+            { return distanceKm; }
+            set
+            {
+                distanceKm = value;
+            }
         }
         public int FromAirportID
         {
-            get => fromAirportID;
-            set => fromAirportID = value;
+            get
+            { return fromAirportID; }
+            set
+            { fromAirportID = value; }
         }
     }
 }

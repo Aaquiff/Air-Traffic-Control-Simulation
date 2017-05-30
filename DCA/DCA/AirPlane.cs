@@ -16,7 +16,7 @@ namespace DCA
         {
             LANDED,
             INTRANSIT,
-            ENTERINGCIRCLE,
+            ENTERING_CIRCLING,
             CIRCLING,
             CRASHED
         }
@@ -55,48 +55,56 @@ namespace DCA
 
         public int AirplaneId
         {
-            get => airplaneId;
-            set => airplaneId = value;
+            get { return airplaneId; }
+            set { airplaneId = value; }
         }
         public string PlaneType
         {
-            get => planeType;
-            set => planeType = value;
+            get { return planeType; }
+            set { planeType = value; }
         }
         public double CruisingKPH
         {
-            get => cruisingKPH;
-            set => cruisingKPH = value;
+            get { return cruisingKPH; }
+            set { cruisingKPH = value; }
         }
         public double FuelConsPerHour
         {
-            get => fuelConsPerHour;
-            set => fuelConsPerHour = value;
+            get { return fuelConsPerHour; }
+            set { fuelConsPerHour = value; }
         }
         public int CurrentAirportID
         {
-            get => currentAirportID;
-            set => currentAirportID = value;
+            get
+            {
+                return currentAirportID;
+            }
+            set { currentAirportID = value; }
         }
         public AirRoute CurrentRoute {
-            get => currentRoute;
-            set => currentRoute = value;
+            get
+            { return currentRoute; }
+            set { currentRoute = value; }
         }
         public Double DistanceTravelled{
-            get => distanceTravelled;
-            set => distanceTravelled = value;
+            get
+            {
+                return distanceTravelled;
+            }
+                set { distanceTravelled = value;
+            }
         }
         public AirPlaneState State {
-            get => state;
-            set => state = value;
+            get { return state; }
+            set { state = value; } 
         }
         public Double TimeWaited {
-            get => timeWaited;
-            set => timeWaited = value;
+            get { return timeWaited; }
+            set { timeWaited = value; }
         }
         public double Fuel {
-            get => fuel;
-            set => fuel = value;
+            get { return fuel; }
+            set { fuel = value; }
         }
     }
 }

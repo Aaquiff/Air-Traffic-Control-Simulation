@@ -1,11 +1,5 @@
-cd DCA
-MSBuild.exe
-cd ..
-cd DCASlave
-MSBuild.exe
-cd ..
-cd DCAGUI
-MSBuild.exe
-cd ..
+MSBuild.exe.lnk %~dp0/DCA/DCA/DCA.csproj
+MSBuild.exe.lnk %~dp0/DCASlave/DCASlave/DCASlave.csproj
+MSBuild.exe.lnk %~dp0/DCAGUI/DCAGUI/DCAGUI.csproj
 
 set /p DUMMY=Hit ENTER to continue..

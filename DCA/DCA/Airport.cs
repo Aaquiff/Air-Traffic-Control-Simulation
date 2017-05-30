@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ATCDatabase;
 using System.Runtime.Serialization;
+using System.Runtime.CompilerServices;
 
 namespace DCA
 {
@@ -30,10 +31,13 @@ namespace DCA
         List<AirPlane> inTransit;
 
         [DataMember]
-        Queue<AirPlane> circlingPlanes;
+        List<AirPlane> circlingPlanes;
 
         [DataMember]
-        Queue<AirPlane> enteringCirclingPlanes;
+        List<AirPlane> enteringCirclingPlanes;
+
+        [DataMember]
+        List<AirPlane> crashedPlanes;
 
         public Airport(int aId)
         {
@@ -44,6 +48,9 @@ namespace DCA
             planes = new List<AirPlane>();
             inTransit = new List<AirPlane>();
             landedPlanes = new Queue<AirPlane>();
+            enteringCirclingPlanes = new List<AirPlane>();
+            circlingPlanes = new List<AirPlane>();
+            crashedPlanes = new List<AirPlane>();
             foreach (int item in pids)
             {
                 AirPlane plane = new AirPlane(item);
@@ -78,10 +85,60 @@ namespace DCA
             set { planes = value; }
         }
 
-        public Queue<AirPlane> LandedPlanes { get => landedPlanes; set => landedPlanes = value; }
-        public Queue<AirPlane> CirclingPlanes { get => circlingPlanes; set => circlingPlanes = value; }
-        public Queue<AirPlane> EnteringCirclingPlanes { get => enteringCirclingPlanes; set => enteringCirclingPlanes = value; }
-        public Queue<AirRoute> DepartingRoutes { get => departingRoutes; set => departingRoutes = value; }
-        public List<AirPlane> InTransit { get => inTransit; set => inTransit = value; }
+        public Queue<AirPlane> LandedPlanes
+        {
+            get
+            {
+                return landedPlanes;
+            }
+            set
+            {
+                landedPlanes = value;
+            }
+        }
+        public List<AirPlane> CirclingPlanes
+        {
+            get
+            {
+                return circlingPlanes;
+            }
+            set { circlingPlanes = value;
+            }
+        }
+
+        public List<AirPlane> EnteringCirclingPlanes
+        {
+            get
+            {
+                return enteringCirclingPlanes;
+            }
+            set
+            {
+                enteringCirclingPlanes = value;
+            }
+
+        }
+
+        public Queue<AirRoute> DepartingRoutes
+        {
+            get { return departingRoutes; }
+            set { departingRoutes = value; }
+        }
+        public List<AirPlane> InTransit
+        {
+            get
+            {
+                return inTransit;
+            }
+            set { inTransit = value; }
+            }
+        public List<AirPlane> CrashedPlanes
+        {
+            get
+            {
+                return crashedPlanes;
+            }
+            set { crashedPlanes = value; }
+            }
     }
 }

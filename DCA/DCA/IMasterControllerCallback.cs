@@ -12,5 +12,8 @@ namespace DCA
     {
         [OperationContract(IsOneWay =true)]
         void Simulate();
+
+        [OperationContract(IsOneWay = true)]
+        void HandoverPlane(AirPlane plane);
     }
 }

@@ -20,9 +20,15 @@ namespace DCA
         [OperationContract]
         void Update(Airport airport);
 
+        [OperationContract]
+        void Handover(AirPlane plane);
+
         /* GUI */
         [OperationContract]
         void init();
+
+        [OperationContract]
+        void StepAsync();
 
         [OperationContract]
         List<Airport> GetAirports();
