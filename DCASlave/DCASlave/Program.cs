@@ -22,6 +22,11 @@ namespace DCASlave
 
             Console.WriteLine("Press any key to exit");
             Console.ReadLine();
+
+            for (int i = 0; i < 4; i++)
+            {
+                slaves[i].Detach();
+            }
         }
     }
 }

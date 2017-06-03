@@ -10,10 +10,10 @@ namespace DCA
     [ServiceContract]
     public interface IMasterControllerCallback
     {
-        [OperationContract(IsOneWay =true)]
-        void Simulate();
+        [OperationContract]
+        Airport Simulate();
 
-        [OperationContract(IsOneWay = true)]
+        [OperationContract(IsOneWay =true)]
         void HandoverPlane(AirPlane plane);
     }
 }

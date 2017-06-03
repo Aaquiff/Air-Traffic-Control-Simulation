@@ -1,0 +1,30 @@
+title WPF Sim Step
+
+DCAGUI->DCA: StepAsync()
+DCA->.NET Code: StepAsyncDelegate.BeginInvoke()
+
+par
+.NET Code->.NET Code: StepAsyncInvoke()
+.NET Code->DCASlave1: Simulate()
+DCASlave1->DCA: UpdateMaster()
+
+else
+.NET Code->.NET Code: StepAsyncInvoke()
+.NET Code->DCASlave2: Simulate()
+DCASlave2->DCA: UpdateMaster()
+
+else
+.NET Code->.NET Code: StepAsyncInvoke()
+.NET Code->DCASlave3: Simulate()
+DCASlave3->DCA: UpdateMaster()
+
+else
+.NET Code->.NETCODE: StepAsyncInvoke()
+.NET Code->DCASlave4: Simulate()
+DCASlave4->DCA: UpdateMaster()
+
+end
+
+DCA->.NET Code: StepAsyncDelegate.EndInvoke()
+
+DCA->DCAGUI: Airports

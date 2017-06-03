@@ -3,17 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Messaging;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DCA
 {
-    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, UseSynchronizationContext = false, InstanceContextMode = InstanceContextMode.Single)]
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, UseSynchronizationContext = true, InstanceContextMode = InstanceContextMode.Single)]
     internal class MasterControllerImpl : IMasterController
     {
         private delegate void StepAsyncDelegate(int i);
-        private AsyncCallback callBackDelegate;
         //Callback interface to each ATC slave
         IMasterControllerCallback[] callBacks;
         //List of airports
@@ -41,7 +41,7 @@ namespace DCA
 
         [OperationBehavior]
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public Airport Attach()
+        public Airport AttachSlave()
         {
             if (count > 2)
             {
@@ -62,38 +62,50 @@ namespace DCA
         }
 
         [OperationBehavior]
-        public void init()
-        {
-            for (int i = 0; i < callBacks.Length; i++)
-            {
-                callBacks[i].Simulate();
-            }
-        }
-
-        public void StepAsync()
+        public List<Airport> StepAsync()
         {
             IAsyncResult[] result = new IAsyncResult[callBacks.Length];
-            StepAsyncDelegate sad = new StepAsyncDelegate(StepAsyncInvoke);
-            callBackDelegate = StepAsync_OnComplete;
+            StepAsyncDelegate[] stepAsyncDelegates = new StepAsyncDelegate[callBacks.Length];
+            //StepAsyncDelegate sad = new StepAsyncDelegate(StepAsyncInvoke);
+            
             for (int i = 0; i < callBacks.Length; i++)
             {
-                result[i] = sad.BeginInvoke(i,callBackDelegate,null);
-                sad.EndInvoke(result[i]);
+                AsyncCallback callBackDelegate;
+                callBackDelegate = StepAsync_OnComplete;
+                stepAsyncDelegates[i] = new StepAsyncDelegate(StepAsyncInvoke);
+
+                result[i] = stepAsyncDelegates[i].BeginInvoke(i,null,null);
             }
+            //Wait for all async calls to finish
+            for (int i = 0; i < callBacks.Length; i++)
+            {
+
+                //stepAsyncDelegates[i].EndInvoke(result[i]);
+            }
+            return GetAirports();
         }
 
         public void StepAsyncInvoke(int index)
         {
-            callBacks[index].Simulate();
+            airports[index] = callBacks[index].Simulate();
         }
 
         public void StepAsync_OnComplete(IAsyncResult result)
         {
             Console.WriteLine("StepAsync_OnComplete");
+            StepAsyncDelegate stepAsyncDelg;
+            AsyncResult asnycObj = (AsyncResult)result;
+
+            if(asnycObj.EndInvokeCalled == false)
+            {
+                stepAsyncDelg = (StepAsyncDelegate)asnycObj.AsyncDelegate;
+
+            }
         }
 
+        [OperationBehavior]
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Update(Airport airport)
+        public void UpdateMaster(Airport airport)
         {
             Console.WriteLine("Slaves Updating Master");
             Console.WriteLine(airport.Name);
@@ -101,11 +113,12 @@ namespace DCA
 
             for (int i = 0; i < airports.Length; i++)
             {
-                    if (airports[i].AirportId == airport.AirportId)
-                        airports[i] = airport;
+                if (airports[i].AirportId == airport.AirportId)
+                    airports[i] = airport;
             }
         }
 
+        [OperationBehavior]
         public List<Airport> GetAirports()
         {
             List<Airport> airportList = new List<Airport>();
@@ -118,12 +131,14 @@ namespace DCA
 
         //Handover an airplane from one airport to another
         [MethodImpl(MethodImplOptions.Synchronized)]
+        [OperationBehavior]
         public void Handover(AirPlane plane)
         {
+            Console.WriteLine("Master receiving plane for handover");
             int toAiportID = plane.CurrentRoute.ToAirportID;
             for (int i = 0; i < airports.Length; i++)
             {
-                if (airports[i].AirportId.Equals(toAiportID) )
+                if (airports[i].AirportId.Equals(toAiportID))
                 {
                     callBacks[i].HandoverPlane(plane);
                     break;

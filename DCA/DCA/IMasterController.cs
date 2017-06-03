@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
+using System.Runtime.CompilerServices;
 
 namespace DCA
 {
@@ -12,23 +13,19 @@ namespace DCA
     {
         /* Slave */
         [OperationContract]
-        Airport Attach();
+        Airport AttachSlave();
 
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void Detach();
 
         [OperationContract]
-        void Update(Airport airport);
+        void UpdateMaster(Airport airport);
 
-        [OperationContract]
+        [OperationContract(IsOneWay =true)]
         void Handover(AirPlane plane);
 
-        /* GUI */
         [OperationContract]
-        void init();
-
-        [OperationContract]
-        void StepAsync();
+        List<Airport> StepAsync();
 
         [OperationContract]
         List<Airport> GetAirports();

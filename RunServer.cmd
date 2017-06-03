@@ -1,2 +1,2 @@
-START DCA.exe
-START DCASlave.exe
+START DeployFiles/DCA.exe
+START DeployFiles/DCASlave.exe

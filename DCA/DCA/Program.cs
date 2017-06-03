@@ -15,8 +15,13 @@ namespace DCA
         {
             MasterControllerImpl masterController = new MasterControllerImpl();
             ServiceHost host = CreateHost(masterController);
-
+            
             host.Open();
+
+            Console.WriteLine("Press Enter to call");
+            Console.ReadLine();
+            masterController.StepAsync();
+
             Console.WriteLine("Press Enter to Exit");
             Console.ReadLine();
             host.Close();

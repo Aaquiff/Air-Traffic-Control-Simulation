@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DCASlave
 {
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = true)]
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
     public class Slave : IMasterControllerCallback
     {
         public Airport airport;
@@ -18,11 +18,11 @@ namespace DCASlave
         public Slave()
         {
             m_Master = CreateChannel();
-            airport = m_Master.Attach();
+            airport = m_Master.AttachSlave();
             Console.WriteLine(airport.Name);
         }
 
-        ~Slave()
+        public void Detach()
         {
             m_Master.Detach();
         }
@@ -42,7 +42,19 @@ namespace DCASlave
             airport.EnteringCirclingPlanes.Add(plane);
         }
 
-        public void Simulate()
+        private void Check(List<AirPlane> x1, List<AirPlane> x2)
+        {
+            foreach (var item in x1)
+            {
+                foreach (var item2 in x2)
+                {
+                    if (x1.Equals(x2))
+                        Console.WriteLine("Problem : Plane exists in two lists");
+                }
+            }
+        }
+
+        public Airport Simulate()
         {
             try
             {
@@ -55,10 +67,8 @@ namespace DCASlave
                 //Plane at the head of landed queue should leave if it has waited for 60 minutes
                 if (airport.LandedPlanes.Count > 0 && airport.LandedPlanes.Peek().TimeWaited >= 60)
                 {
-
                     //Get first plane to leave from the landed queue
                     AirPlane airPlane = airport.LandedPlanes.Dequeue();
-                    Console.WriteLine("Plane " + airPlane.AirplaneId + " is leaving");
                     //Set Time waited to -1 since it's in flight
                     airPlane.TimeWaited = -1;
                     //Set the plane state to INTRANSIT
@@ -73,9 +83,8 @@ namespace DCASlave
                     airport.DepartingRoutes.Enqueue(route);
                     //Add it to intransit planes
                     airport.InTransit.Add(airPlane);
-
                     //Fuel up for the route
-                    airPlane.Fuel = (airPlane.CurrentRoute.DistanceKm / airPlane.CruisingKPH) * airPlane.FuelConsPerHour * 1.15;
+                    airPlane.Fuel = (airPlane.CurrentRoute.DistanceKm / airPlane.CruisingKPH) * airPlane.FuelConsPerHour * 1.15;  
                 }
 
                 //Planes in transit should move with time
@@ -146,7 +155,7 @@ namespace DCASlave
                         airport.CrashedPlanes.Add(item);
                     }
                 }
-                
+
                 if (airport.CirclingPlanes.Count > 0)
                 {
                     //Assume the first plane in the list has the least fuel
@@ -158,7 +167,9 @@ namespace DCASlave
                             planeWithLowestFuel = plane;
                     }
                     //Remove the selected plane from circling list and add to LandedQueue
+
                     airport.CirclingPlanes.Remove(planeWithLowestFuel);
+
                     planeWithLowestFuel.State = AirPlane.AirPlaneState.LANDED;
                     planeWithLowestFuel.DistanceTravelled = 0;
                     planeWithLowestFuel.CurrentAirportID =  airport.AirportId;
@@ -167,6 +178,7 @@ namespace DCASlave
 
                     airport.LandedPlanes.Enqueue(planeWithLowestFuel);
 
+                    //Remove Crashed Planes
                     List<AirPlane> crashed = new List<AirPlane>();
                     foreach (AirPlane plane in airport.CirclingPlanes)
                     {
@@ -182,13 +194,20 @@ namespace DCASlave
                         item.State = AirPlane.AirPlaneState.CRASHED;
                         airport.CrashedPlanes.Add(item);
                     }
+
+                    Check(airport.CirclingPlanes, airport.LandedPlanes.ToList());
+
                 }
-                
-                m_Master.Update(airport);
+
+                return airport;
+                //m_Master.UpdateMaster(airport);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("**************************");
+                Console.WriteLine("EXCEPTION : "+ex.Message);
+                Console.WriteLine("**************************");
+                throw ex;
             }
         }
 

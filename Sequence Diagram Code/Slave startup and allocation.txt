@@ -1,0 +1,8 @@
+title Slave start-up and allocation
+
+DCASlave->ChannelFactory: Create()
+ChannelFactory->DCASlave: IMasterController
+DCASlave->DCA: Attach()
+DCA->Airport: Create()
+Airport->DCA: Airport
+DCA->DCASlave: Airport

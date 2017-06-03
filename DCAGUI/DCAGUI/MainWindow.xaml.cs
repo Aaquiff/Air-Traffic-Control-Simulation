@@ -44,7 +44,8 @@ namespace DCAGUI
             if (channel != null)
             {
                 channel.StepAsync();
-                LoadAirports();
+                Airports = channel.GetAirports();
+                airportListView.ItemsSource = Airports;
             }
         }
         //Creates a channel to the Master server
@@ -83,15 +84,20 @@ namespace DCAGUI
                     List<AirPlane> circlingPlanes = airport.CirclingPlanes.ToList();
                     List<AirPlane> enteringCirclingPlanes = airport.EnteringCirclingPlanes.ToList();
                     List<AirPlane> crashedPlanes = airport.CrashedPlanes.ToList();
+                    List<AirPlane> outBoundPlanes = new List<AirPlane>();
+                    outBoundPlanes.AddRange(circlingPlanes);
+                    outBoundPlanes.AddRange(enteringCirclingPlanes);
+                    outBoundPlanes.AddRange(crashedPlanes);
 
-                    inBoundPlanesListView.ItemsSource = circlingPlanes.Concat(enteringCirclingPlanes).Concat(crashedPlanes);
-                    inBoundPlanesListView.Items.Refresh();
+                    inBoundPlanesListView.ItemsSource = outBoundPlanes;
 
                     List<AirPlane> landedPlanes = airport.LandedPlanes.ToList();
                     List<AirPlane> inTransitPlanes = airport.InTransit.ToList();
+                    List<AirPlane> inBoundPlanes = new List<AirPlane>();
+                    inBoundPlanes.AddRange(landedPlanes);
+                    inBoundPlanes.AddRange(inTransitPlanes);
 
-                    outBoundPlanesListView.ItemsSource = landedPlanes.Concat(inTransitPlanes);
-                    outBoundPlanesListView.Items.Refresh();
+                    outBoundPlanesListView.ItemsSource = inBoundPlanes;
                 }
             }
         }
@@ -111,13 +117,14 @@ namespace DCAGUI
     {
         public void HandoverPlane(AirPlane plane)
         {
-            throw new NotImplementedException();
+            
         }
 
         [OperationBehavior]
-        public void Simulate()
+        public Airport Simulate()
         {
             Console.WriteLine(" GUI Callback");
+            return null;
         }
     }
 }
