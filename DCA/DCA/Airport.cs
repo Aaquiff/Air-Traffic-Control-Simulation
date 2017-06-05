@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using ATCDatabase;
 using System.Runtime.Serialization;
 using System.Runtime.CompilerServices;
@@ -14,9 +14,6 @@ namespace DCA
     {
         [DataMember]
         int airportId;
-
-        [DataMember]
-        List<AirPlane> planes;
 
         [DataMember]
         Queue<AirRoute> departingRoutes;
@@ -45,7 +42,6 @@ namespace DCA
             ATCDB db = new ATCDB();
             db.LoadAirport(aId, out name);
             int[] pids = db.GetAirplaneIDsForAirport(airportId);
-            planes = new List<AirPlane>();
             inTransit = new List<AirPlane>();
             landedPlanes = new Queue<AirPlane>();
             enteringCirclingPlanes = new List<AirPlane>();
@@ -54,7 +50,6 @@ namespace DCA
             foreach (int item in pids)
             {
                 AirPlane plane = new AirPlane(item);
-                planes.Add(plane);
                 landedPlanes.Enqueue(plane);
             }
 
@@ -81,8 +76,10 @@ namespace DCA
         
         public List<AirPlane> Planes
         {
-            get { return planes; }
-            set { planes = value; }
+            get
+            {
+                return LandedPlanes.ToList().Concat(CirclingPlanes).Concat(EnteringCirclingPlanes).Concat(CrashedPlanes).Concat(InTransit).ToList();
+            }
         }
 
         public Queue<AirPlane> LandedPlanes

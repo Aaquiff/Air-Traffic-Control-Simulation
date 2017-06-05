@@ -1,4 +1,6 @@
-﻿var req = null;
+﻿var airportReq = null;
+var airplaneReq = null;
+var stepReq = null;
 
 function LoadAirports()
 {
@@ -7,17 +9,17 @@ function LoadAirports()
 
 function LoadAirportsAsync(fnOnCompletion) {
     try {
-        req = null;
+        airportReq = null;
         if (window.XMLHttpRequest != undefined) {
-            req = new XMLHttpRequest();
+            airportReq = new XMLHttpRequest();
         }
         else {
-            req = new ActiveXObject("Microsoft.XMLHTTP");
+            airportReq = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        req.onreadystatechange = fnOnCompletion;
-        req.open("POST", "DCAService.svc", true);
-        req.setRequestHeader("Content-Type", "text/xml;");
-        req.setRequestHeader("SOAPAction", "http://tempuri.org/IDCAService/GetAirports");
+        airportReq.onreadystatechange = fnOnCompletion;
+        airportReq.open("POST", "DCAService.svc", true);
+        airportReq.setRequestHeader("Content-Type", "text/xml;");
+        airportReq.setRequestHeader("SOAPAction", "http://tempuri.org/IDCAService/GetAirports");
 
         var msg =
             '<?xml version="1.0" encoding="utf-8"?> \n\
@@ -27,7 +29,7 @@ function LoadAirportsAsync(fnOnCompletion) {
             </soapenv:Body>  \n\
         </soapenv:Envelope> ' ;
 
-        req.send(msg);
+        airportReq.send(msg);
     }
     catch (err) {
         alert(err);
@@ -36,10 +38,10 @@ function LoadAirportsAsync(fnOnCompletion) {
 
 function fnOn_LoadAirportsAsync_Completion() {
 
-    if (req.readyState == 4) {
-        if (req.status == 200) {
+    if (airportReq.readyState == 4) {
+        if (airportReq.status == 200) {
             var text = "";
-            var ndResult = req.responseXML.documentElement.getElementsByTagName("GetAirportsResult")[0];
+            var ndResult = airportReq.responseXML.documentElement.getElementsByTagName("GetAirportsResult")[0];
             var childCount = ndResult.childElementCount;
 
             var html = "<h3>Airports</h3>  <div class='list - group'>";
@@ -54,7 +56,7 @@ function fnOn_LoadAirportsAsync_Completion() {
             divAirports.innerHTML = html;
         }
         else {
-            alert("Async call failed - " + req.status + " " + req.statusText);
+            alert("Async call failed - " + airportReq.status + " " + airportReq.statusText);
         }
     }
 }
@@ -65,17 +67,17 @@ function LoadPlanes(airportId) {
 
 function LoadPlanesAsync(airportId,fnOnCompletion) {
     try {
-        req = null;
+        airplaneReq = null;
         if (window.XMLHttpRequest != undefined) {
-            req = new XMLHttpRequest();
+            airplaneReq = new XMLHttpRequest();
         }
         else {
-            req = new ActiveXObject("Microsoft.XMLHTTP");
+            airplaneReq = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        req.onreadystatechange = fnOnCompletion;
-        req.open("POST", "DCAService.svc", true);
-        req.setRequestHeader("Content-Type", "text/xml;");
-        req.setRequestHeader("SOAPAction", "http://tempuri.org/IDCAService/GetAirplanes");
+        airplaneReq.onreadystatechange = fnOnCompletion;
+        airplaneReq.open("POST", "DCAService.svc", true);
+        airplaneReq.setRequestHeader("Content-Type", "text/xml;");
+        airplaneReq.setRequestHeader("SOAPAction", "http://tempuri.org/IDCAService/GetAirplanes");
 
         var msg =
             '<?xml version="1.0" encoding="utf-8"?> \n\
@@ -87,7 +89,7 @@ function LoadPlanesAsync(airportId,fnOnCompletion) {
             </soapenv:Body>  \n\
         </soapenv:Envelope> ' ;
 
-        req.send(msg);
+        airplaneReq.send(msg);
         divAirplanes.innerHTML = "<h3>Loading</h3>"
     }
     catch (err) {
@@ -97,10 +99,10 @@ function LoadPlanesAsync(airportId,fnOnCompletion) {
 
 function fnOn_LoadPlanesAsync_Completion() {
 
-    if (req.readyState == 4) {
-        if (req.status == 200) {
+    if (airplaneReq.readyState == 4) {
+        if (airplaneReq.status == 200) {
             var text = "";
-            var ndResult = req.responseXML.documentElement.getElementsByTagName("GetAirplanesResult")[0];
+            var ndResult = airplaneReq.responseXML.documentElement.getElementsByTagName("GetAirplanesResult")[0];
             var childCount = ndResult.childElementCount;
 
             var html = "<h3>Planes</h3> <table class='table'> ";
@@ -129,7 +131,53 @@ function fnOn_LoadPlanesAsync_Completion() {
             divAirplanes.innerHTML = html;
         }
         else {
-            alert("Async call failed - " + req.status + " " + req.statusText);
+            alert("Async call failed - " + airplaneReq.status + " " + airplaneReq.statusText);
+        }
+    }
+}
+
+function Step()
+{
+    StepAsync(StepAsyncCompleted);
+}
+
+function StepAsync(fnOnCompletion)
+{
+    try {
+        stepReq = null;
+        if (window.XMLHttpRequest != undefined) {
+            stepReq = new XMLHttpRequest();
+        }
+        else {
+            stepReq = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        stepReq.onreadystatechange = fnOnCompletion;
+        stepReq.open("POST", "DCAService.svc", true);
+        stepReq.setRequestHeader("Content-Type", "text/xml;");
+        stepReq.setRequestHeader("SOAPAction", "http://tempuri.org/IDCAService/StepAsync");
+
+        var msg =
+            '<?xml version="1.0" encoding="utf-8"?> \n\
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/"> \n\
+           <soapenv:Body> \n\
+                <tem:StepAsync/> \n\
+            </soapenv:Body>  \n\
+        </soapenv:Envelope> ' ;
+
+        stepReq.send(msg);
+    }
+    catch (err) {
+        alert(err);
+    }
+}
+
+function StepAsyncCompleted() {
+    if (stepReq.readyState == 4) {
+        if (stepReq.status == 200) {
+
+        }
+        else {
+            alert("Async call failed - " + stepReq.status + " " + stepReq.statusText);
         }
     }
 }

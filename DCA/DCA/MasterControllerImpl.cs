@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Messaging;
 using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DCA
 {
@@ -64,6 +64,7 @@ namespace DCA
         [OperationBehavior]
         public List<Airport> StepAsync()
         {
+            Console.WriteLine("Stepping");
             IAsyncResult[] result = new IAsyncResult[callBacks.Length];
             StepAsyncDelegate[] stepAsyncDelegates = new StepAsyncDelegate[callBacks.Length];
             //StepAsyncDelegate sad = new StepAsyncDelegate(StepAsyncInvoke);
@@ -145,5 +146,17 @@ namespace DCA
                 }
             }
         }
+
+        public List<AirPlane> GetAirplanes(int airportId)
+        {
+            foreach (Airport item in airports)
+            {
+                if (item.AirportId.Equals(airportId))
+                    return item.LandedPlanes.ToList();
+            }
+            Console.WriteLine("Airport Not Found");
+            throw new Exception("Airport Not Found");
+        }
+
     }
 }
